@@ -23,12 +23,31 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder encoder) {
-        // 5 seeded users (username = role in lowercase, password = "password")
-        UserDetails superAdmin = User.withUsername("superadmin").password(encoder.encode("password")).roles("SUPER_ADMIN").build();
-        UserDetails recruiter  = User.withUsername("recruiter").password(encoder.encode("password")).roles("RECRUITER").build();
-        UserDetails entAdmin   = User.withUsername("eadmin").password(encoder.encode("password")).roles("ENTERPRISE_ADMIN").build();
-        UserDetails employee   = User.withUsername("employee").password(encoder.encode("password")).roles("EMPLOYEE").build();
-        UserDetails vendor     = User.withUsername("vendor").password(encoder.encode("password")).roles("VENDOR").build();
+        UserDetails superAdmin = User.withUsername("superadmin")
+                .password(encoder.encode("password"))
+                .roles("SUPERADMIN")                 // was SUPER_ADMIN
+                .build();
+
+        UserDetails recruiter  = User.withUsername("recruiter")
+                .password(encoder.encode("password"))
+                .roles("RECRUITER")
+                .build();
+
+        UserDetails entAdmin   = User.withUsername("eadmin")
+                .password(encoder.encode("password"))
+                .roles("EADMIN")                     // was ENTERPRISE_ADMIN
+                .build();
+
+        UserDetails employee   = User.withUsername("employee")
+                .password(encoder.encode("password"))
+                .roles("EMPLOYEE")
+                .build();
+
+        UserDetails vendor     = User.withUsername("vendor")
+                .password(encoder.encode("password"))
+                .roles("VENDOR")
+                .build();
+
         return new InMemoryUserDetailsManager(superAdmin, recruiter, entAdmin, employee, vendor);
     }
 
