@@ -1,0 +1,43 @@
+roles:
+  superadmin:
+    - dashboard.view
+    - recruiters.manage
+    - candsearch.linkedin
+    - candsearch.naukri
+    - candsearch.internaldb
+    - resume.check
+    - role.manager.view
+    - role.manager.admin
+    - role.manager.recruiter
+    - internaldb.view
+    - licensing.view
+    - licensing.addenterprise
+    - licensing.roletracker
+    - licensing.instancetracker
+
+  recruiter:
+    - dashboard.view
+    - candsearch.linkedin
+    - candsearch.naukri
+    - resume.check
+    - role.manager.view
+    - role.manager.recruiter
+    - role.manager.allcandidates
+
+  eadmin:
+    - dashboard.view
+    - employees.manage
+
+  employee:
+    - dashboard.view
+    - vendors.manage
+    - candsearch.linkedin
+    - candsearch.naukri
+    - resume.check
+    - role.manager.view
+    - role.manager.admin
+    - role.manager.vendor
+
+  vendor:
+    - dashboard.view
+    - role.manager.view

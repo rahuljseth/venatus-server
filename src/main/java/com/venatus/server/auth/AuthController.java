@@ -1,33 +1,51 @@
 package com.venatus.server.auth;
 
+import com.venatus.server.capabilities.ICapabilitiesService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
+@RequestMapping("/auth")
 public class AuthController {
 
-    @GetMapping("/auth/ping")
+    private final ICapabilitiesService capabilitiesService;
+
+    public AuthController(ICapabilitiesService capabilitiesService) {
+        this.capabilitiesService = capabilitiesService;
+    }
+
+    @GetMapping("/ping")
     public Map<String, String> ping() {
         return Map.of("status", "ok");
     }
 
-    @GetMapping("/auth/whoami")
-    public Map<String, Object> whoAmI(Authentication auth) {
-        // Example authorities from Spring: ROLE_SUPERADMIN, ROLE_RECRUITER, etc.
-        List<String> roles = auth.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)       // "ROLE_SUPERADMIN"
-                .map(s -> s.replaceFirst("^ROLE_", ""))    // "SUPERADMIN"
-                .map(String::toLowerCase)                  // "superadmin"
-                .toList();
+    @GetMapping("/whoami")
+    public WhoAmIResponse whoAmI(Authentication auth) {
+        String username = auth.getName();
 
-        return Map.of(
-                "username", auth.getName(),
-                "roles", roles
-        );
+        // e.g. ROLE_SUPERADMIN → "superadmin"
+        List<String> roles = auth.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .map(this::normalizeRole)
+                .filter(s -> !s.isBlank())
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
+
+        // union of capabilities for all roles (order preserved from YAML)
+        List<String> capabilities = capabilitiesService.unionList(roles);
+
+        return new WhoAmIResponse(username, roles, capabilities);
+    }
+
+    private String normalizeRole(String authority) {
+        if (authority == null) return "";
+        String r = authority;
+        if (r.startsWith("ROLE_")) r = r.substring(5);
+        return r.toLowerCase(Locale.ROOT).trim();
     }
 }
